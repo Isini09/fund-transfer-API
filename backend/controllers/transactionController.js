@@ -9,14 +9,13 @@ const createAccountController = (req, res) => {
             return res.status(400).json({error: 'Account number and amount is required'});
         }
         const account = createAccount(accountNumber, balance);
-        res.status(201).json(account);
+        return res.status(201).json({
+            message: 'Account created successfully',
+            Account: accountNumber,
+            Balance: balance,
+        });
 
-         //Return a success response
-    return res.status(200).json({
-        message: 'Account created successfully',
-        Account: accountNumber,
-        Balance: balance,
-    });
+        
     }catch(error){
         res.status(400).json({error: error.message});
     }
@@ -60,27 +59,28 @@ const transferFunds = (req, res) => {
         return res.status(404).json({error: 'Destination account not found'});
     }
 
-    //Check if the source account has sufficient funds
-    const sourceAccount = getAccount(sourceAccountNumber);
-    if (sourceAccount.balance < transferAmount){
-        return res.status(400).json({message: 'Insufficient Funds'});
-    }
+    // //Check if the source account has sufficient funds
+    // const sourceAccount = getAccount(sourceAccountNumber);
+    // const destinationAccount = getAccount(destinationAccountNumber);
+
+    // if (sourceAccount.balance < transferAmount){
+    //     return res.status(400).json({message: 'Insufficient Funds'});
+    // }
 
     //Perform the transfer
-    const destinationAccount = getAccount(destinationAccountNumber);
-    updateAccountBalance(sourceAccountNumber, sourceAccount.balance - transferAmount);
-    updateAccountBalance(destinationAccountNumber, destinationAccount.balance + transferAmount);
+    
+    sourceAccount.balance -= transferAmount;
+    destinationAccount.balance += transferAmount;
 
 
     //Return a success response
     return res.status(200).json({
         message: 'Transfer successful',
-        sourceAccount: getAccount(sourceAccountNumber),
-        destinationAccount: getAccount(destinationAccountNumber),
+        sourceAccount: sourceAccount,
+        destinationAccount: destinationAccount,
     });
 
-
-};
+    };
 
 
 module.exports = { createAccountController, getAccountController, transferFunds };
